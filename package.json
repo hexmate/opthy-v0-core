@@ -1,0 +1,11 @@
+{
+  "name": "opthy-v0-core",
+  "description": "Opthy v0 core contracts and artifacts",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opthydefi/opthy-v0-core.git"
+  },
+  "license" : "BUSL-1.1",
+  "author": "Phroi (https://phroi.com/)"
+}
