@@ -76,9 +76,7 @@ contract Opthys is DoublyLinkedNode(address(0x0),address(0x0)) {
         addChild(address(o));
         
         token0_.safeTransferFrom(msg.sender, address(o), amount0_);
-        uint256 b0;
-        uint256 b1;
-        (b0,b1) = o.balance();
+        (uint256 b0, uint256 b1) = o.balance();
         require(b0 != b1, "Tokens must be two distinct ERC20 tokens");
         
         //emit NewOpthy(address(l), token, startingPrize, minGamble, weight, gamblingBlocks);
@@ -126,13 +124,13 @@ contract Opthys is DoublyLinkedNode(address(0x0),address(0x0)) {
     }
 }
 
-
+//TODO: block.timestamp for the scope of the hackathon can be trusted, it will be unsafe to trust (and other solutions may appear as well)
 contract Opthy is DoublyLinkedNode {
     using SafeERC20 for IERC20;
     
     //All fields are constant after agreement
     
-    //phase during hagglig it's a positive serial number, after agreement becomes constant to zero
+    //phase during hagglig it's a positive serial number, after agreement becomes constant zero
     uint32 public phase;
     //duration is the quantity of seconds the opthy contract is alive after agreement
     uint32 public duration;
@@ -172,7 +170,7 @@ contract Opthy is DoublyLinkedNode {
         holder      =   holder_;
         seller      =   seller_;
 
-        expiration  =   block.timestamp;
+        // expiration  =   0;
         
         require(address(token0_) != address(0x0) && address(token1_) != address(0x0), "Token addresses must be valid ERC20 addresses");
         require(address(token0_) != address(token1_), "Tokens must be two distinct ERC20 tokens");
@@ -198,8 +196,6 @@ contract Opthy is DoublyLinkedNode {
         require(duration_ > 0, "Duration must be a non zero quantity");
         duration = duration_;
         
-        expiration = block.timestamp;
-        
         require(r0_ > 0 && r1_ > 0, "Reserve constants must be a non zero quantity");
         r0 = r0_;
         r1 = r1_;
@@ -222,7 +218,7 @@ contract Opthy is DoublyLinkedNode {
         } else {
             holder = msg.sender;
         }
-        expiration = block.timestamp + duration;
+        expiration = block.timestamp + duration;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
         
         token0.safeTransferFrom(msg.sender, address(this), amount0_);
         require(token0.balanceOf(address(this)) >= r0, "Insufficient liquidity");
@@ -232,7 +228,7 @@ contract Opthy is DoublyLinkedNode {
     function swap(uint128 amount0In_, uint128 amount1In_, uint128 amount0Out_, uint128 amount1Out_) public {
         require(phase == 0, "Opthy still in haggling phase");
         require(msg.sender == holder, "You're not the opthy holder");
-        require(block.timestamp < expiration, "Opthy expired");
+        require(block.timestamp < expiration, "Opthy expired");  //Safe for the hackathon, unsafe for production///////////////////////////////
         require(amount0Out_ > 0 || amount1Out_ > 0, "At least one output must be a non zero quantity");
         
         //Transfer inputs
@@ -260,7 +256,7 @@ contract Opthy is DoublyLinkedNode {
     
     
     function reclaim() public {
-        require(block.timestamp >= expiration,"Opthy not yet expired");
+        require(block.timestamp >= expiration,"Opthy not yet expired");  //Safe for the hackathon, unsafe for production////////////////////////
         address owner = getOwner();
         require(msg.sender == owner, "You're not the owner");
 
