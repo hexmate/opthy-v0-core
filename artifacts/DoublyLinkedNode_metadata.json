@@ -96,11 +96,11 @@
 	},
 	"sources": {
 		"contracts/Opthy.sol": {
-			"keccak256": "0x00a25069c9f1df58927c155ef5a6f1c39760b149544b855cbd582c95907a3205",
+			"keccak256": "0x62e45ebb485fbdf3354e97144141e67d3b0a95769d571534b271797e4aef3631",
 			"license": "BUSL-1.1",
 			"urls": [
-				"bzz-raw://26a6c7dc51e9e5eabafd73972bf56bf8f1ad62ed261cfd3a2e0db10bf9f38c5b",
-				"dweb:/ipfs/QmW3unLmJXT9Jqangz3kCVjtn8spLAxw84i69PAasptCUy"
+				"bzz-raw://44d10ab0b185055c248ebb7846a707413266e5f37c4acaa8ea966f1ee291ac56",
+				"dweb:/ipfs/QmaVBZKdaoneuF6soV2g9rgVDTqyaqp21bZ943VnvGxZuA"
 			]
 		},
 		"https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol": {

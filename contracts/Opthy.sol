@@ -57,8 +57,9 @@ contract DoublyLinkedNode {
 //Opthys is a registry of the opthys, it's also the guard of the Circular Doubly Linked List
 contract Opthys is DoublyLinkedNode(address(0x0),address(0x0)) {
     using SafeERC20 for IERC20;
-    //event  NewOpthy(address indexed opthy, IERC20 indexed token, uint256 startingPrize, uint256 minGamble, uint8 weight, uint24 gamblingBlocks);
 
+
+    event NewOpthy(address indexed opthy, address indexed creator);
     function newOpthy(bool ISell_, uint32 duration_, IERC20 token0_, IERC20 token1_, uint128 r0_, uint128 r1_, uint128 amount0_) public returns(address) {
         require(amount0_ > 0, "Amount0 must be a non zero quantity");
         
@@ -78,8 +79,8 @@ contract Opthys is DoublyLinkedNode(address(0x0),address(0x0)) {
         token0_.safeTransferFrom(msg.sender, address(o), amount0_);
         (uint256 b0, uint256 b1) = o.balance();
         require(b0 != b1, "Tokens must be two distinct ERC20 tokens");
-        
-        //emit NewOpthy(address(l), token, startingPrize, minGamble, weight, gamblingBlocks);
+    
+        emit NewOpthy(address(o), msg.sender);
         
         return address(o);
     }
@@ -124,7 +125,7 @@ contract Opthys is DoublyLinkedNode(address(0x0),address(0x0)) {
     }
 }
 
-//TODO: block.timestamp for the scope of the hackathon can be trusted, it will be unsafe to trust (and other solutions may appear as well)
+//TODO: block.timestamp for the scope of the hackathon can be trusted, in production would be unsafe to trust (and other solutions may appear as well)
 contract Opthy is DoublyLinkedNode {
     using SafeERC20 for IERC20;
     
@@ -186,6 +187,7 @@ contract Opthy is DoublyLinkedNode {
         return seller!=address(0x0)?seller:holder;
     }
     
+    event Update(address indexed creator, uint32 phase);
     function update(uint32 duration_, uint128 amount0_, uint128 r0_, uint128 r1_) public {
         require(phase > 0, "Phase mismatch");
         phase++;
@@ -203,9 +205,12 @@ contract Opthy is DoublyLinkedNode {
         if (amount0_ > 0) {
             token0.safeTransferFrom(msg.sender, address(this), amount0_);
         }
+        
+        emit Update(owner, phase);
     }
     
-
+    
+    event Agree(address indexed counterparty, uint256 expiration);
     function agree(uint128 amount0_, uint32 phase_) public {
         require(phase > 0 && phase == phase_, "Phase mismatch");
         phase = 0;
@@ -222,9 +227,12 @@ contract Opthy is DoublyLinkedNode {
         
         token0.safeTransferFrom(msg.sender, address(this), amount0_);
         require(token0.balanceOf(address(this)) >= r0, "Insufficient liquidity");
+        
+        emit Agree(msg.sender, expiration);
     }
     
     
+    event Swap(address indexed holder, uint128 amount0In, uint128 amount1In, uint128 amount0Out, uint128 amount1Out);
     function swap(uint128 amount0In_, uint128 amount1In_, uint128 amount0Out_, uint128 amount1Out_) public {
         require(phase == 0, "Opthy still in haggling phase");
         require(msg.sender == holder, "You're not the opthy holder");
@@ -251,10 +259,11 @@ contract Opthy is DoublyLinkedNode {
         (uint256 balance0, uint256 balance1) = balance();
         require(r1 * balance0 + r0 * balance1 >= uint256(r0)*uint256(r1), "Insufficient liquidity");
 
-        //emit Swap(amount0In_, amount1In_, amount0Out_, amount1Out_);
+        emit Swap(holder, amount0In_, amount1In_, amount0Out_, amount1Out_);
     }
     
     
+    event Reclaim(address indexed owner, uint256 balance0, uint256 balance1);
     function reclaim() public {
         require(block.timestamp >= expiration,"Opthy not yet expired");  //Safe for the hackathon, unsafe for production////////////////////////
         address owner = getOwner();
@@ -270,11 +279,9 @@ contract Opthy is DoublyLinkedNode {
             token1.safeTransfer(owner, balance1);
         }
         
-        // if (balance0 > 0 || balance1 > 0) {
-           // emit Reclaim(seller, balance0, balance1);////////////////////////////////////////////////
-        //}
-        
         super.delist();
+        
+        emit Reclaim(owner, balance0, balance1);
     }
     
     
