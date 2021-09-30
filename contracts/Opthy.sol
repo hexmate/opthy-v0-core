@@ -140,7 +140,7 @@ contract Opthy is DoublyLinkedNode {
     address public holder;
     //seller contains the zero address while still haggling on opthy details, if proposed by the holder
     address public seller;
-    //expiration during haggling is zero, while in opthy lifetime it contains the timestamp at which the opthy expires
+    //expiration during haggling is the creation-timestamp/last-modified-timestamp, while in opthy lifetime it contains the timestamp at which the opthy expires
     uint256 public expiration;
     
     //tokens used in the opthy
@@ -171,7 +171,7 @@ contract Opthy is DoublyLinkedNode {
         holder      =   holder_;
         seller      =   seller_;
 
-        // expiration  =   0;
+        expiration = block.timestamp + duration;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
         
         require(address(token0_) != address(0x0) && address(token1_) != address(0x0), "Token addresses must be valid ERC20 addresses");
         require(address(token0_) != address(token1_), "Tokens must be two distinct ERC20 tokens");
@@ -197,6 +197,8 @@ contract Opthy is DoublyLinkedNode {
         
         require(duration_ > 0, "Duration must be a non zero quantity");
         duration = duration_;
+        
+        expiration = block.timestamp + duration;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
         
         require(r0_ > 0 && r1_ > 0, "Reserve constants must be a non zero quantity");
         r0 = r0_;
