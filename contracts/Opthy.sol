@@ -171,7 +171,7 @@ contract Opthy is DoublyLinkedNode {
         holder      =   holder_;
         seller      =   seller_;
 
-        expiration = block.timestamp + duration;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
+        expiration = block.timestamp;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
         
         require(address(token0_) != address(0x0) && address(token1_) != address(0x0), "Token addresses must be valid ERC20 addresses");
         require(address(token0_) != address(token1_), "Tokens must be two distinct ERC20 tokens");
@@ -198,7 +198,7 @@ contract Opthy is DoublyLinkedNode {
         require(duration_ > 0, "Duration must be a non zero quantity");
         duration = duration_;
         
-        expiration = block.timestamp + duration;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
+        expiration = block.timestamp;  //Safe for the hackathon, unsafe for production//////////////////////////////////////////////
         
         require(r0_ > 0 && r1_ > 0, "Reserve constants must be a non zero quantity");
         r0 = r0_;
